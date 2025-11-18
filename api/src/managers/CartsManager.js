@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const productsManager = require('./ProductsManager');
+const ProductsManager = require('./ProductsManager');
 
 const CARTS_PATH = path.join(__dirname, '../data/carts.json');
 const productsManager = new productsManager();
@@ -29,12 +29,12 @@ class CartsManager {
 
     async getCartById (id){
         const carts = await this.read();
-        return carts.find(c => c.id === id) || null;
+        return carts.find(c => c.id === Number(id)) || null;
     }
 
     async addProductToCart (cartId, productId){
         const carts = await this.read();
-        const cartIdx = carts.findIndex(c => c.id === cartId);
+        const cartIdx = carts.findIndex(c => c.id === Number(cartId));
         if (cartIdx === -1) return {error: 'Carrito no encontrado'};
 
         const product = await productsManager.getById(productId);
@@ -48,7 +48,6 @@ class CartsManager {
             cart.products.push({productId, quantity: 1});
         }
 
-        carts[cartIdx] = cart;
         await this.write(carts);
         return cart;
     }

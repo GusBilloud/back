@@ -23,18 +23,35 @@ app.use('/api/carts', cartsRouter);
 
 
 app.get('/', async (req, res) => {
-    const products = await productsManager.getAll();
-    res.render('home', { 
-        title: 'Mate & Te Co.',
-        message: 'Bienvenido a la API de Mate & Te Co.',
-        description: 'API para la gestión de una tienda de mates y tés.',
-        version: '1.0.0'
-    });
+    try{
+        const products = await productsManager.getAll();
+        res.render('home', { 
+            title: 'Mate & Te Co.',
+            message: 'Bienvenido a la API de Mate & Te Co.',
+            description: 'API para la gestión de una tienda de mates y tés.',
+            version: '1.0.0'
+        });
+    } catch (error) {
+        res.status(500).send('Error al cargar la página principal');
+    }    
 });
 
 app.get('/realTimeProducts', async (req, res) => {
-    const products = await productsManager.getAll();
-    res.render('realTimeProducts', { products });
+    try{
+        const products = await productsManager.getAll();
+        res.render('realTimeProducts', { products });
+    } catch (error) {
+        res.status(500).send('Error al cargar la página de productos en tiempo real');
+    }    
+});
+
+app.use((req, res, next) => {
+    res.status(404).send('Ruta no encontrada');
+});
+
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Error interno del servidor');
 });
 
 module.exports = app;

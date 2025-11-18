@@ -3,12 +3,24 @@
 <section>
     <h3>Crear producto</h3>
     <form id="productForm">
+    <label>
+        Nombre del producto:
         <input type="text" name="producto" placeholder="Nombre del producto" required />
-        <input type="number" name="precio" placeholder="Precio" required />
-        <input type="number" name="stock" placeholder="Stock" required />
+    </label>
+    <label>
+        Precio:
+        <input type="number" name="precio" placeholder="Precio" min="0" step="0.01" required />
+    </label>
+    <label>
+        Stock:
+        <input type="number" name="stock" placeholder="Stock" min="0" required />
+    </label>
+    <label>
+        Categoría:
         <input type="text" name="categoria" placeholder="Categoría" />
-        <button type="submit">Crear</button>
-    </form>
+    </label>
+    <button type="submit">Crear</button>
+</form>
 </section>
 
 <hr />
@@ -22,7 +34,7 @@
                 - ${{this.precio}}
                 - Stock: {{this.stock}}
                 - Categoría: {{this.categoria}}
-                <button class="delete-product" data-id="{{this.id}}">Eliminar</button>
+                <button class="delete-product" data-id="{{this.id}}" aria-label="Eliminar {{this.producto}}">Eliminar</button>
             </li>
         {{/each}}
     </ul>

@@ -1,18 +1,18 @@
 const socket = io();
 
-socket.on('product', (product) => {
+socket.on('product', (products) => {
     const list = document.getElementById('productList');
     list.innerHTML = '';
 
-    product.forEach((p) => {
+    products.forEach((p) => {
         const li = document.createElement('li');
-        li.dataset.id = p.id
+        li.dataset.id = p.id;
         li.innerHTML = `
             <strong>${p.name}</strong>
-            - $${p.price} 
+            - $${p.price}
             - Stock: ${p.stock}
             - Categoria: ${p.category}
-            <button class="delete-btn" data-id="${p.id}">Delete</button>`;
+            <button class="delete-product" data-id="${p.id}">Delete</button>`;
         list.appendChild(li);
     });
 });
@@ -24,7 +24,8 @@ form.addEventListener('submit', (e) => {
     const formData = new FormData(form);
     const product = Object.fromEntries(formData.entries());
 
-    product.precio = Number(product.precio);
+    // Aseguramos las claves correctas para price y stock
+    product.price = Number(product.price || product.precio || 0);
     product.stock = Number(product.stock);
 
     socket.emit('newProduct', product);
