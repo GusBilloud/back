@@ -1,0 +1,12 @@
+<h2>Listado de productos (vista estática)</h2>
+
+<ul>
+    {{#each products}}
+        <li>
+            <strong>{{this.producto}}</strong>
+            - ${{this.precio}}
+            - Stock: {{this.stock}}
+            - Categoría: {{this.categoria}}
+        </li>
+    {{/each}}
+</ul>
