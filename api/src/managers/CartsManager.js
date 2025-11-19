@@ -3,7 +3,7 @@ const path = require('path');
 const ProductsManager = require('./ProductsManager');
 
 const CARTS_PATH = path.join(__dirname, '../data/carts.json');
-const productsManager = new productsManager();
+const productsManager = new ProductsManager();
 
 class CartsManager {
     async read (){
