@@ -1,12 +1,5 @@
 [
   {
-    "id": 1,
-    "producto": "Mate Imperial de Calabaza con Virola Alpaca",
-    "precio": 14500,
-    "stock": 15,
-    "categoria": "mates"
-  },
-  {
     "id": 2,
     "producto": "Mate Camionero Forrado en Cuero Marrón",
     "precio": 12500,
@@ -117,5 +110,19 @@
     "precio": 42900,
     "stock": 5,
     "categoria": "combos"
+  },
+  {
+    "id": 18,
+    "producto": "Yerba Mate La Merced Barbacua",
+    "precio": 4500,
+    "stock": 10,
+    "categoria": "yerbas"
+  },
+  {
+    "id": 19,
+    "producto": "Mate de Madera con borde de Acero",
+    "precio": 15000,
+    "stock": 8,
+    "categoria": "mates"
   }
 ]

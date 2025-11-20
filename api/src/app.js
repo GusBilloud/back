@@ -9,7 +9,7 @@ const productsManager = new ProductsManager();
 app.use (express.json());
 app.use (express.urlencoded({ extended: true }));
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../public')));
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
@@ -24,12 +24,14 @@ app.use('/api/carts', cartsRouter);
 
 app.get('/', async (req, res) => {
     try{
-        const products = await productsManager.getAll();
+        let products = await productsManager.getAll();
+        products = products.sort((a, b) => a.producto.localeCompare(b.producto));
         res.render('home', { 
             title: 'Mate & Te Co.',
             message: 'Bienvenido a la API de Mate & Te Co.',
             description: 'API para la gestión de una tienda de mates y tés.',
-            version: '1.0.0'
+            version: '1.0.0',
+            products
         });
     } catch (error) {
         res.status(500).send('Error al cargar la página principal');
