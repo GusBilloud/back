@@ -1,0 +1,20 @@
+<h1>{{product.title}}</h1>
+
+<p>{{product.description}}</p>
+
+<ul>
+  <li><b>Precio:</b> ${{product.price}}</li>
+  <li><b>Categoría:</b> {{product.category}}</li>
+  <li><b>Stock:</b> {{product.stock}}</li>
+  <li><b>Estado:</b> {{#if product.status}}Disponible{{else}}No disponible{{/if}}</li>
+</ul>
+
+{{#if cartId}}
+  <form action="/api/carts/{{cartId}}/products/{{product._id}}" method="post">
+    <button type="submit">Agregar al carrito</button>
+  </form>
+{{/if}}
+
+<p>
+  <a href="/products{{#if cartId}}?cartId={{cartId}}{{/if}}">⬅ Volver a productos</a>
+</p>

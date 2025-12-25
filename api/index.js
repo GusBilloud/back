@@ -1,52 +1,103 @@
+require('dotenv').config();
+
 const http = require('http');
 const { Server } = require('socket.io');
-const app = require('./src/app');
-const ProductsManager = require('./src/managers/ProductsManager');
-const { parse } = require('path');
 
-const PORT = 3000;
+const connectDB = require('./src/config/db');
+const app = require('./src/app');
+
+const ProductModel = require('./src/models/Product.model');
+
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 const io = new Server(server);
 
 app.set('io', io);
 
-const productsManager = new ProductsManager();
+io.on('connection', async (socket) => {
+  console.log('Nuevo cliente conectado:', socket.id);
 
-io.on('connection', async(socket) => {
-    console.log('Nuevo cliente conectado');
+  try {
+    const products = await ProductModel.find().lean();
+    socket.emit('products', products);
+  } catch (err) {
+    console.error('Error enviando productos iniciales:', err.message);
+    socket.emit('socketError', { action: 'init', message: err.message });
+  }
 
+  socket.on('newProduct', async (data) => {
     try {
-        const products = await productsManager.getAll();
-        socket.emit('products', products);
-    } catch (error) {
-        console.error('Error al obtener los productos:', error);
+      const title = String(data?.title || '').trim();
+      const description = String(data?.description || '').trim();
+      const code = String(data?.code || '').trim();
+
+      const price = Number(data?.price);
+      const stock = Number(data?.stock);
+      const category = String(data?.category || '').trim();
+
+      const statusRaw = data?.status;
+      const status = statusRaw === undefined ? true : statusRaw === true || statusRaw === 'true';
+
+      if (!title || !description || !code || !category || Number.isNaN(price) || Number.isNaN(stock)) {
+        socket.emit('socketError', {
+          action: 'newProduct',
+          message: 'Datos inválidos: title/description/code/category obligatorios y price/stock numéricos.',
+        });
+        return;
+      }
+
+      await ProductModel.create({
+        title,
+        description,
+        price,
+        stock,
+        category,
+        status,
+        thumbnails: [],
+      });
+
+      const products = await ProductModel.find().lean();
+      io.emit('products', products);
+    } catch (err) {
+      console.error('Error newProduct:', err.message);
+      socket.emit('socketError', { action: 'newProduct', message: err.message });
     }
+  });
 
-    socket.on('newProduct', async (productData) => {
-        try{
-            console.log('Nuevo producto recibido:', productData);
-            await productsManager.create(productData)
-            const updated= await productsManager.getAll();
-            io.emit('products', updated);
-        } catch (error) { 
-            console.error('Error al crear el producto:', error)
-        }
-    });    
+  socket.on('deleteProduct', async (pid) => {
+    try {
+      if (!pid) {
+        socket.emit('socketError', {
+          action: 'deleteProduct',
+          message: 'Falta pid para eliminar.',
+        });
+        return;
+      }
 
-    socket.on('deleteProduct', async (productId) => {
-        try {
-            console.log('Eliminar producto con ID:', productId);
-            const id = parseInt(productId, 10);
-            await productsManager.delete(id);
-            const updated = await productsManager.getAll();
-            io.emit('products', updated);
-        } catch (error) {
-            console.error('Error al eliminar el producto:', error);
-        }
+      await ProductModel.findByIdAndDelete(pid);
+
+      const products = await ProductModel.find().lean();
+      io.emit('products', products);
+    } catch (err) {
+      console.error('Error deleteProduct:', err.message);
+      socket.emit('socketError', { action: 'deleteProduct', message: err.message });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Cliente desconectado:', socket.id);
+  });
+});
+
+(async () => {
+  try {
+    await connectDB();
+    server.listen(PORT, () => {
+      console.log(`Servidor escuchando en http://localhost:${PORT}`);
     });
-});
-
-server.listen(PORT, () => {
-    console.log(`Servidor escuchando en el puerto http://localhost:${PORT}`);
-});
+  } catch (error) {
+    console.error('No se pudo iniciar el servidor (DB)', error);
+    process.exit(1);
+  }
+})();

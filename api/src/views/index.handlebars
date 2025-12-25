@@ -1,0 +1,53 @@
+<h1>Listado de productos</h1>
+
+<div style="margin-bottom: 12px;">
+  <small>
+    limit: {{limit}} | page: {{page}}
+    {{#if sort}} | sort: {{sort}}{{/if}}
+    {{#if query}} | query: {{query}}{{/if}}
+  </small>
+</div>
+
+<ul>
+  {{#each products}}
+    <li style="margin-bottom: 10px;">
+      <b>{{this.title}}</b> - ${{this.price}} <br/>
+      Categoría: {{this.category}} <br/>
+      Estado: {{#if this.status}}Disponible{{else}}No disponible{{/if}} <br/>
+
+      <a href="/products/{{this._id}}{{#if ../cartId}}?cartId={{../cartId}}{{/if}}">
+        Ver detalle
+      </a>
+
+      {{#if ../cartId}}
+        <form action="/api/carts/{{../cartId}}/products/{{this._id}}" method="post" style="display:inline;">
+          <button type="submit">Agregar al carrito</button>
+        </form>
+      {{else}}
+        <small style="color: gray;">(Tip: agregá ?cartId=TU_CARRITO para habilitar “Agregar”)</small>
+      {{/if}}
+    </li>
+  {{/each}}
+</ul>
+
+<hr/>
+
+<div style="display:flex; gap:12px; align-items:center;">
+  {{#if hasPrevPage}}
+    <a href="/products?page={{prevPage}}&limit={{limit}}{{#if sort}}&sort={{sort}}{{/if}}{{#if query}}&query={{query}}{{/if}}{{#if cartId}}&cartId={{cartId}}{{/if}}">
+      ⬅ Anterior
+    </a>
+  {{else}}
+    <span style="color: gray;">⬅ Anterior</span>
+  {{/if}}
+
+  <span>Página {{page}}</span>
+
+  {{#if hasNextPage}}
+    <a href="/products?page={{nextPage}}&limit={{limit}}{{#if sort}}&sort={{sort}}{{/if}}{{#if query}}&query={{query}}{{/if}}{{#if cartId}}&cartId={{cartId}}{{/if}}">
+      Siguiente ➡
+    </a>
+  {{else}}
+    <span style="color: gray;">Siguiente ➡</span>
+  {{/if}}
+</div>
